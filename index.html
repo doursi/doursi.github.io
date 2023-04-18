@@ -1,1 +1,48 @@
-este e o index.html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Web Audio API: Tocar Frequências</title>
+  </head>
+  <body>
+    <h1>Web Audio API: Tocar Frequências</h1>
+    
+    <script>
+      // Criar contexto de áudio
+      var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Lê a lista de frequências e tempos a partir de um arquivo texto
+      fetch('frequencias.txt')
+        .then(response => response.text())
+        .then(text => {
+          var lista = text.split('\n');
+
+          // Para cada linha na lista, tocar a frequência e tempo especificados
+          lista.forEach(linha => {
+            var dados = linha.split(',');
+            var frequencia1 = parseFloat(dados[0]);
+            var frequencia2 = parseFloat(dados[1]);
+            var tempo = parseFloat(dados[2]);
+
+            // Criar os osciladores para as frequências esquerda e direita
+            var osciladorEsquerda = audioContext.createOscillator();
+            var osciladorDireita = audioContext.createOscillator();
+            osciladorEsquerda.frequency.value = frequencia1;
+            osciladorDireita.frequency.value = frequencia2;
+
+            // Conectar os osciladores aos canais esquerdo e direito
+            osciladorEsquerda.connect(audioContext.destination, 0, 0);
+            osciladorDireita.connect(audioContext.destination, 0, 1);
+
+            // Iniciar os osciladores e esperar o tempo especificado
+            osciladorEsquerda.start();
+            osciladorDireita.start();
+            setTimeout(() => {
+              osciladorEsquerda.stop();
+              osciladorDireita.stop();
+            }, tempo * 1000);
+          });
+        });
+    </script>
+  </body>
+</html>
